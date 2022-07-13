@@ -1,0 +1,58 @@
+{
+  "AWSEBDockerrunVersion": 2,
+  "containerDefinitions": [
+    {
+      "name": "nginx",
+      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${APPLICATION_NAME}_",
+      "hostname": "nginx",
+      "essential": true,
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 80
+        }
+      ],
+      "links": ["app", "postgres", "mongo"],
+      "memory": 100
+    },
+    {
+      "name": "app",
+      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${APPLICATION_NAME}_",
+      "hostname": "app",
+      "essential": false,
+      "portMappings": [
+        {
+          "hostPort": 8083,
+          "containerPort": 8083
+        }
+      ],
+      "memory": 300
+    },
+    {
+      "name": "postgres",
+      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${APPLICATION_NAME}_postgres",
+      "hostname": "postgres",
+      "essential": false,
+      "portMappings": [
+        {
+          "hostPort": 5432,
+          "containerPort": 5432
+        }
+      ],
+      "memory": 300
+    },
+    {
+      "name": "mongo",
+      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${APPLICATION_NAME}_mongo",
+      "hostname": "mongo",
+      "essential": false,
+      "portMappings": [
+        {
+          "hostPort": 27017,
+          "containerPort": 27017
+        }
+      ],
+      "memory": 300
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+version: "3"
+services:
+    postgres_db:
+        image: postgres:13
+        env_file:
+            - postgresconfig.env
+        volumes:
+             - postgres:/data/postgres
+        ports:
+            - 5432:5432
+            # - 3.135.195.103:5400:5432
+        networks: 
+            - postgres_network
+
+    mongo_db:
+        image: mongo
+        env_file:
+            - mongodbconfig.env
+        volumes:
+             - mongo:/data/mongo
+             - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+        ports:
+            - 27017:27017
+        networks: 
+            - mongo_network
+
+    app:
+        build: 
+            context: .
+            dockerfile: Dockerfile.app
+        ports:
+            - 8083:8083
+        depends_on: 
+            - postgres_db
+            - mongo_db
+        volumes: 
+            - .:/app/
+        networks: 
+            - postgres_network
+            - nginx_network
+            - mongo_network
+
+
+    nginx:
+        image: nginx
+        ports: 
+            - 80:80
+            - 443:443
+        volumes:
+            - .:/api
+            - ./nginx/secret:/keys
+            - ./nginx/local.conf:/etc/nginx/conf.d/default.conf
+        depends_on: 
+            - app
+        networks: 
+            - nginx_network
+
+        
+
+networks: 
+    postgres_network:
+        driver: bridge
+    nginx_network:
+        driver: bridge
+    mongo_network:
+        driver: bridge
+
+volumes: 
+    postgres:
+    mongo:
+
+
+
